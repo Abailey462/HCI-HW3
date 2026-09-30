@@ -46,15 +46,38 @@ def add_question(req: QuestionRequest):
         "a": req.answer
     })
 
-# TODO: Add a new route that can be used to delete a question/answer from the dataset.
 @app.delete("/delete/{id}")
-def delete_question(id: int):
-    pass
+def delete_question(id: int) -> None:
+    """Removes a question with the given id from the in-memory database.
+    
+    Args:
+        id: The id corresponding to the question to delete.
+    
+    Raises:
+        HTTPException: If the given question id does not exist in the in-memory database.
+    """
+    for x in questions:
+        if x["id"] == id:
+            questions.remove(x)
+            return
+    raise HTTPException(status_code=404, detail="Question with ID {id} not found")
 
-# TODO: Add a new route that can be used to update a question/answer within the dataset.
 @app.put("/update/{id}")
-def update_question(id: int, req: QuestionRequest):
-    pass
+def update_question(id: int, req: QuestionRequest) -> None:
+    """Update the contents of a question with given question request.
+    
+    Args:
+        id: The id corresponding to the question to update.
+        req: The contents of to update the question with.
+
+    Raises: HTTPException: If the given question id does not exist in the in-memory database.
+    """
+    for x in questions:
+        if x["id"] == id:
+            x["q"] = req.question
+            x["a"] = req.answer
+            return
+    raise HTTPException(status_code=404, detail="Question with ID {id} not found")
 
 if __name__=="__main__":
     uvicorn.run(app, port=8005)
